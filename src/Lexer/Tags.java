@@ -1,4 +1,7 @@
 package Lexer;
+/*
+ * @author Jonas Oliveira da Silva Filho
+*/
 
 enum Tags {
 
@@ -29,7 +32,7 @@ enum Tags {
 
     KW,
 
-    //Identificadores:
+    // Identificadores:
 
     ID,
 
@@ -42,5 +45,6 @@ enum Tags {
     CON_NUM,
     CON_CHAR,
 
+    // Fim do arquivo:
     EOF
 }

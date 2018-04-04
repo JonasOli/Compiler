@@ -1,5 +1,9 @@
 package Lexer;
 
+/*
+ * @author Jonas Oliveira da Silva Filho
+*/
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 

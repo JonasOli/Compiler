@@ -1,5 +1,9 @@
 package Lexer;
 
+/*
+ * @author Jonas Oliveira da Silva Filho
+*/
+
 class Token {
     private int line;
     private int column;

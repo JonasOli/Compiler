@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"Lexer","l":"FileFunctions"},{"p":"Lexer","l":"Lexer"}]

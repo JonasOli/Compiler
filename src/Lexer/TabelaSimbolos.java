@@ -1,5 +1,9 @@
 package Lexer;
 
+/*
+ * @author Jonas Oliveira da Silva Filho
+*/
+
 import java.util.ArrayList;
 
 class TabelaSimbolos {

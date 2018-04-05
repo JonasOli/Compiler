@@ -116,78 +116,8 @@ class RetornaToken {
                         sinalizaErro("Caractere invalido " + c + " na linha " + line + " e coluna " + column);
                         estado = 1;
                     }
-                    break;
-                case 35:
-                    if (Character.isLetterOrDigit(c)) {
-                        // estado 35
-                        lexema.append(c);
-                        Token tn = TS.retornaToken(lexema.toString());
-                        if (tn != null) {
-                            return new Token(Tags.KW, lexema.toString(), line, column);
-                        }
-                    } else {
-                        // estado 36
-                        returnPointer();
-                        return new Token(Tags.ID, lexema.toString(), line, column);
-                    }
-                    break;
-                case 25:
-                    if (Character.isDigit(c)) {
-                        // estado 25
-                        lexema.append(c);
-                    } else if (c == '.') {
-                        // estado 32
-                        if (Character.isDigit(c)){
-                            lexema.append(c);
-                        } else {
-                            sinalizaErro("Após um ponto deve haver pelo menos um digito! Linha: " + line + " Coluna: " + column);
-                            estado = 1;
-                        }
-                    } else if (lexema.toString().split(".").length > 1) {
-                        sinalizaErro("asijdjoasijdasoijdosaidjoasdjasoid Linha: " + line + " Coluna: " + column);
-                        estado = 1;
-                    } else {
-                        // estado 26
-                        returnPointer();
-                        return new Token(Tags.CON_NUM, lexema.toString(), line, (column - 1));
-                    }
-                    break;
-                case 5:
-                    if (c == '=') {
-                        // estado 6
-                        return new Token(Tags.OP_EQ, "==", line, column);
-                    } else {
-                        // estado 7
-                        returnPointer();
-                        return new Token(Tags.OP_ASS, "=", line, column);
-                    }
-                case 37:
-                    if (c == '"') {
-                        // estado 32
-                        if (lexema.length() == 0) {
-                            sinalizaErro("String não pode ser vazia na linha " + line + " e coluna " + (column - 1));
-                            estado = 1;
-                        } else {
-                            lexema.append(c);
-                            return new Token(Tags.LIT, lexema.toString().split("\"")[0], line, column);
-                        }
-                    } else if (lookahead == file_end) {
-                        sinalizaErro("String não fechada na linha " + line + " e coluna " + (column - 1));
-                        estado = 1;
-                    } else {
-                        // estado 31
-                        lexema.append(c);
-                    }
-                    break;
-                case 8:
-                    if (c == '=') {
-                        // estado 9
-                        return new Token(Tags.OP_GE, ">=", line, column);
-                    } else {
-                        // estado 10
-                        returnPointer();
-                        return new Token(Tags.OP_GT, ">", line, column);
-                    }
+                break;
+
                 case 2:
                     if (c == '=') {
                         // estado 3
@@ -197,25 +127,109 @@ class RetornaToken {
                         returnPointer();
                         return new Token(Tags.OP_LT, "<", line, column);
                     }
+
+                case 5:
+                    if (c == '=') {
+                        // estado 6
+                        return new Token(Tags.OP_EQ, "==", line, column);
+                    } else {
+                        // estado 7
+                        returnPointer();
+                        return new Token(Tags.OP_ASS, "=", line, column);
+                    }
+
+                case 8:
+                    if (c == '=') {
+                        // estado 9
+                        return new Token(Tags.OP_GE, ">=", line, column);
+                    } else {
+                        // estado 10
+                        returnPointer();
+                        return new Token(Tags.OP_GT, ">", line, column);
+                    }
+
                 case 11:
                     if (c == '=') {
                         // estado 12
                         return new Token(Tags.OP_NE, "!=", line, column);
                     } else {
-                        sinalizaErro("Caractere \"=\" esperado na linha " + line + " e coluna " + column);
+                        returnPointer();
                         estado = 1;
+                        sinalizaErro("Caractere \"=\" esperado na linha " + line + " e coluna " + column);
+                    }
+                break;
+
+                case 25:
+                    if (Character.isDigit(c)) {
+                        // estado 25
+                        lexema.append(c);
+                    } else if (c == '.') {
+                        lexema.append(c);
+                        estado = 32;
+                    } else {
+                        // estado 26
+                        returnPointer();
+                        return new Token(Tags.CON_NUM, lexema.toString(), line, (column - 1));
+                    }
+                break;
+
+                case 35:
+                    if (Character.isLetterOrDigit(c) && lookahead != file_end) {
+                        // estado 35
+                        lexema.append(c);
+                    } else {
+                        returnPointer();
+                        Token tn = TS.retornaToken(lexema.toString());
+                        if (tn == null) {
+                            return new Token(Tags.ID, lexema.toString(), line, column);
+
+                        }
+                        // estado 36
+                        return new Token(Tags.KW, lexema.toString(), line, column);
+                    }
+                break;
+
+                case 32:
+                    if (Character.isDigit(c) && lookahead != file_end){
+                        lexema.append(c);
+                    } else {
+                        returnPointer();
+                        return new Token(Tags.CON_NUM, lexema.toString(), line, column);
+                    }
+                break;
+
+                case 37:
+                    if (c == '"') {
+                        // estado 32
+                        if (lexema.length() == 0) {
+                            lexema.setLength(0);
+                            sinalizaErro("String não pode ser vazia na linha " + line + " e coluna " + (column - 1));
+                            estado = 1;
+                        } else {
+                            lexema.append(c);
+                            return new Token(Tags.LIT, lexema.toString().split("\"")[0], line, column);
+                        }
+                    } else if (lookahead == file_end) {
+                        lexema.setLength(0);
+                        sinalizaErro("String não fechada na linha " + line + " e coluna " + (column - 1));
+                    } else {
+                        // estado 31
+                        lexema.append(c);
                     }
                     break;
+
                 case 40:
-                    if (c == '\''){
+                    if (c == '\'') {
                         if (lexema.length() > 1) {
                             sinalizaErro("Caractere deve ter apenas um digito!! Linha: " + line + " e coluna: " + column);
                             estado = 1;
+                            lexema.setLength(0);
                         } else {
                             lexema.append(c);
                             return new Token(Tags.CON_CHAR, lexema.toString().split("\'")[0], line, column);
                         }
                     } else if (lookahead == file_end) {
+                        lexema.setLength(0);
                         sinalizaErro("Caractere não fechado na linha: " + line + " e coluna: " + (column - 1));
                         estado = 1;
                     } else {

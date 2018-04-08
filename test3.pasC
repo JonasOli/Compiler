@@ -3,7 +3,7 @@
 */
 
 program {
-    num i = 20; // variavel i
+    num i = 20.1; // variavel i
     num j = 30; // variavel j
     num f = 40; // variavel f
     num h = 50; // variavel h

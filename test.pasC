@@ -1,5 +1,4 @@
 program {
-
     num i = 50;
     num f = 20;
     num g = i + f;

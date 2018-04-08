@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
 public class Lexer {
     public static void main(String[] args) {
         FileFunctions ff = new FileFunctions(); /* * Classe com funções de abertura e fechamento do arquivo */
-        RandomAccessFile file = ff.openFile("teste_erro1.pasC"); /* * Criando um ramdomAccessFile */
+        RandomAccessFile file = ff.openFile("teste_erro3.pasC"); /* * Criando um ramdomAccessFile */
         RetornaToken tokens = new RetornaToken(file); /* * Criando um objeto da classe que reconhece tokens */
         Token token;
         TabelaSimbolos TS = new TabelaSimbolos();

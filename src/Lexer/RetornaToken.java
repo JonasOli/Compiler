@@ -2,7 +2,8 @@ package Lexer;
 
 /**
  * @author Jonas Oliveira da Silva Filho
-*/
+ *
+ */
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -174,7 +175,7 @@ class RetornaToken {
                     if (c != '*') {
                         estado = 17;
                         if (lookahead == file_end) {
-                            sinalizaErro("Esperado fechamento de comentario com */");
+                            sinalizaErro("Esperado fechamento de comentario com */ Linha: " + line + " Coluna: " + column);
                             estado = 1;
                         }
                     } else {
@@ -187,7 +188,7 @@ class RetornaToken {
                         estado = 1;
                     } else {
                         if (lookahead == file_end) {
-                            sinalizaErro("Esperado fechamento de comentario com */");
+                            sinalizaErro("Esperado fechamento de comentario com */ Linha: " + line + " Coluna: " + column);
                             estado = 1;
                         } else {
                             estado = 17;
@@ -205,11 +206,11 @@ class RetornaToken {
                     break;
 
                 case 25:
-                    if (Character.isDigit(c)) {
+                    if (Character.isDigit(c) && lookahead != file_end) {
                         // estado 25
                         lexema.append(c);
                     } else {
-                        if (c == '.'){
+                        if (c == '.') {
                             lexema.append(c);
                             estado = 32;
                         } else {
@@ -221,12 +222,14 @@ class RetornaToken {
                 break;
 
                 case 32:
-                    if (Character.isDigit(c) || lookahead != file_end){
+                    if (Character.isDigit(c) && lookahead != file_end){
                         lexema.append(c);
                         estado = 25;
                     } else {
-                        sinalizaErro("Erro");
+                        sinalizaErro("Caractere inesperado. Linha: " + line + " Coluna: " + column);
+                        estado = 25;
                     }
+                break;
 
                 case 35:
                     if (Character.isLetterOrDigit(c) && lookahead != file_end) {
@@ -239,6 +242,7 @@ class RetornaToken {
                             return new Token(Tags.ID, lexema.toString(), line, column);
                         } else {
                             // estado 36
+                            column--;
                             return new Token(Tags.KW, lexema.toString(), line, column);
                         }
                     }
@@ -248,8 +252,7 @@ class RetornaToken {
                     if (c == '"') {
                         // estado 32
                         if (lexema.length() == 0) {
-                            lexema.setLength(0);
-                            sinalizaErro("String não pode ser vazia na linha " + line + " e coluna " + column);
+                            sinalizaErro("String não pode ser vazia na linha " + line + " e coluna " + (column - 2));
                             estado = 1;
                         } else {
                             lexema.append(c);
@@ -257,7 +260,7 @@ class RetornaToken {
                         }
                     } else if (lookahead == file_end) {
                         estado = 1;
-                        sinalizaErro("String não fechada na linha " + line + " e coluna " + column);
+                        sinalizaErro("String não fechada na linha " + line + " e coluna " + (column - 1));
                     } else {
                         if (c == '\n') {
                             // estado 31

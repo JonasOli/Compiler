@@ -1,0 +1,16 @@
+/*
+    autor: Jonas
+*/
+
+program {
+    num i = 20; // variavel i
+    num j = 30; // variavel j
+    num f = 40; // variavel f
+    num h = 50; // variavel h
+
+    if (i+j == 50 and h == 50) {
+        write ("i+j é igual a h");
+    } else if (f-i == 20 or i == 20) {
+        write ("f-i ou i é iglal a 20");
+    }
+}

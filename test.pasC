@@ -1,1 +1,12 @@
-10.10.
+program {
+
+    num i = 50;
+    num f = 20;
+    num g = i + f;
+
+    if (g > 20) {
+        write("bla");
+    } else {
+        write("uhashusahusasahu");
+    }
+}

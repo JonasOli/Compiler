@@ -1,5 +1,6 @@
-m "m" 'm' ( ) { } + - / * , ; > >= < <= = == != program, if, else, while, write, read, num, char, not, or, and,
+program {
 
-'m
+    char c = read ("digite uma mensagem: ");
 
-erro string
+    write (c);
+}

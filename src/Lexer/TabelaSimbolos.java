@@ -54,4 +54,19 @@ class TabelaSimbolos {
         }
         return null;
     }
+
+    public void setTabela_simbolos(Token token) {
+        for (Token t : this.tabela_simbolos){
+            if (t.getLexema().equals(token.getLexema())) {
+                return;
+            }
+        }
+        tabela_simbolos.add(token);
+    }
+
+    public void printTabelaSimbolos (){
+        for (Token t : tabela_simbolos){
+            System.out.println("\"Class: \"" + t.getClass_tag() + "\" Lexema: \"" + t.getLexema() + "\"");
+        }
+    }
 }

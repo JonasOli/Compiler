@@ -55,13 +55,14 @@ class RetornaToken {
             } catch (IOException err) {
                 System.out.println("Erro na leitura do arquivo" + err); // Imprime um erro caso de erro na leitura do aquivo
             }
+
             switch (estado) {
                 case 1:
                     if (lookahead == file_end) {
                         return new Token(Tags.EOF, "EOF", 1, 1);
-                    } else if (c == ' ' || c == '\t' || c == '\r') {
-                        estado = 1;
-                    } else if (c == '\n') {
+                    } else if (c == '\t' || c == ' ') {
+                        // estado 1
+                    } else if (c == '\n' || c == '\r') {
                         column = 1;
                         line++;
                         estado = 1;
@@ -81,7 +82,7 @@ class RetornaToken {
                         // estado 15
                         return new Token(Tags.OP_MUL, "*", line, column);
                     } else if (c == '/') {
-                        return new Token(Tags.OP_DIV, "/", line, column);
+                        estado = 16;
                     } else if (c == '(') {
                         // estado 21
                         return new Token(Tags.SMB_OPA, "(", line, column);
@@ -159,19 +160,73 @@ class RetornaToken {
                     }
                 break;
 
+                case 16:
+                    if (c == '*') {
+                        estado = 17;
+                    } else if (c == '/') {
+                        estado = 21;
+                    } else {
+                        return new Token(Tags.OP_DIV, "/", line, column);
+                    }
+                    break;
+
+                case 17:
+                    if (c != '*') {
+                        estado = 17;
+                        if (lookahead == file_end) {
+                            sinalizaErro("Esperado fechamento de comentario com */");
+                            estado = 1;
+                        }
+                    } else {
+                        estado = 19;
+                    }
+                    break;
+
+                case 19:
+                    if (c == '/') {
+                        estado = 1;
+                    } else {
+                        if (lookahead == file_end) {
+                            sinalizaErro("Esperado fechamento de comentario com */");
+                            estado = 1;
+                        } else {
+                            estado = 17;
+                        }
+                    }
+                    break;
+
+                case 21:
+                    if (Character.isLetterOrDigit(c)) {
+                        // estado 22
+                    } else if (c == '\n') {
+                        returnPointer();
+                        estado = 1;
+                    }
+                    break;
+
                 case 25:
                     if (Character.isDigit(c)) {
                         // estado 25
                         lexema.append(c);
-                    } else if (c == '.') {
-                        lexema.append(c);
-                        estado = 32;
                     } else {
-                        // estado 26
-                        returnPointer();
-                        return new Token(Tags.CON_NUM, lexema.toString(), line, (column - 1));
+                        if (c == '.'){
+                            lexema.append(c);
+                            estado = 32;
+                        } else {
+                            // estado 26
+                            returnPointer();
+                            return new Token(Tags.CON_NUM, lexema.toString(), line, (column - 1));
+                        }
                     }
                 break;
+
+                case 32:
+                    if (Character.isDigit(c) || lookahead != file_end){
+                        lexema.append(c);
+                        estado = 25;
+                    } else {
+                        sinalizaErro("Erro");
+                    }
 
                 case 35:
                     if (Character.isLetterOrDigit(c) && lookahead != file_end) {
@@ -182,39 +237,36 @@ class RetornaToken {
                         Token tn = TS.retornaToken(lexema.toString());
                         if (tn == null) {
                             return new Token(Tags.ID, lexema.toString(), line, column);
-
+                        } else {
+                            // estado 36
+                            return new Token(Tags.KW, lexema.toString(), line, column);
                         }
-                        // estado 36
-                        return new Token(Tags.KW, lexema.toString(), line, column);
                     }
-                break;
-
-                case 32:
-                    if (Character.isDigit(c) && lookahead != file_end){
-                        lexema.append(c);
-                    } else {
-                        returnPointer();
-                        return new Token(Tags.CON_NUM, lexema.toString(), line, column);
-                    }
-                break;
+                    break;
 
                 case 37:
                     if (c == '"') {
                         // estado 32
                         if (lexema.length() == 0) {
                             lexema.setLength(0);
-                            sinalizaErro("String não pode ser vazia na linha " + line + " e coluna " + (column - 1));
+                            sinalizaErro("String não pode ser vazia na linha " + line + " e coluna " + column);
                             estado = 1;
                         } else {
                             lexema.append(c);
                             return new Token(Tags.LIT, lexema.toString().split("\"")[0], line, column);
                         }
                     } else if (lookahead == file_end) {
-                        lexema.setLength(0);
-                        sinalizaErro("String não fechada na linha " + line + " e coluna " + (column - 1));
+                        estado = 1;
+                        sinalizaErro("String não fechada na linha " + line + " e coluna " + column);
                     } else {
-                        // estado 31
-                        lexema.append(c);
+                        if (c == '\n') {
+                            // estado 31
+                            line++;
+                            column = 1;
+                            sinalizaErro("String não deve ser fechada em outra linha!! Linha " + line + " e coluna " + column);
+                        } else {
+                            lexema.append(c);
+                        }
                     }
                     break;
 
@@ -233,7 +285,12 @@ class RetornaToken {
                         sinalizaErro("Caractere não fechado na linha: " + line + " e coluna: " + (column - 1));
                         estado = 1;
                     } else {
-                        lexema.append(c);
+                        if (c == '\n') {
+                            line++;
+                            column = 1;
+                        } else {
+                            lexema.append(c);
+                        }
                     }
                     break;
             }
